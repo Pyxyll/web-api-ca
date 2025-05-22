@@ -11,3 +11,15 @@ export const getMovies = async () => {
 
     return await response.json();
 };
+
+export const getGenre = async () => {
+    const response = await fetch(
+        `https://api.themoviedb.org/3/genre/movie/list?api_key=${process.env.TMDB_KEY}&language=en-US`
+    );
+
+    if (!response.ok) {
+        const error = await response.json();
+    }
+
+    return await response.json();
+};
