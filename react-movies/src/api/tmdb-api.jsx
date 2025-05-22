@@ -187,12 +187,27 @@ export const getPerson = async (args) => {
   return await response.json();
 };
 
-  // export const getPerson = ({ queryKey }) => {
+export const getPersonMovies = async (args) => {
+  console.log(args);
+  const [, idPart] = args.queryKey;
+  const { id } = idPart;
+  
+  const response = await fetch(`http://localhost:8080/api/actors/${id}/credits`);
+  
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.status_message || "Something went wrong");
+  }
+  
+  return await response.json();
+};
+  
+  // export const getPersonMovies = ({ queryKey }) => {
   //   const [, idPart] = queryKey;
   //   const { id } = idPart;
     
   //   return fetch(
-  //     `https://api.themoviedb.org/3/person/${id}?api_key=${import.meta.env.TMDB_KEY}`
+  //     `https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${import.meta.env.TMDB_KEY}`
   //   ).then((response) => {
   //     if (!response.ok) {
   //       return response.json().then((error) => {
@@ -205,26 +220,6 @@ export const getPerson = async (args) => {
   //     throw error;
   //   });
   // };
-
-  
-  export const getPersonMovies = ({ queryKey }) => {
-    const [, idPart] = queryKey;
-    const { id } = idPart;
-    
-    return fetch(
-      `https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${import.meta.env.TMDB_KEY}`
-    ).then((response) => {
-      if (!response.ok) {
-        return response.json().then((error) => {
-          throw new Error(error.status_message || "Something went wrong");
-        });
-      }
-      return response.json();
-    })
-    .catch((error) => {
-      throw error;
-    });
-  };
 
   // USERS
   
