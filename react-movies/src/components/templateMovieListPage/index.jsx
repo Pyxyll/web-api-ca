@@ -3,6 +3,21 @@ import Header from "../headerMovieList";
 import FilterCard from "../filterMoviesCard";
 import MovieList from "../movieList";
 import Grid from "@mui/material/Grid2";
+import { styled } from '@mui/material/styles';
+
+const PageContainer = styled('div')(({ theme }) => ({
+  maxWidth: '80%',
+  margin: '0 auto',
+  padding: '0 16px',
+  [theme.breakpoints.down('md')]: {
+    maxWidth: '90%',
+    padding: '0 12px',
+  },
+  [theme.breakpoints.down('sm')]: {
+    maxWidth: '95%',
+    padding: '0 8px',
+  }
+}));
 
 function MovieListPageTemplate({ movies, title, action }) {
   const [nameFilter, setNameFilter] = useState("");
@@ -28,21 +43,23 @@ function MovieListPageTemplate({ movies, title, action }) {
   };
 
   return (
-    <Grid container>
-      <Grid size={12}>
-        <Header title={title} />
+    <PageContainer>
+      <Grid container>
+        <Grid size={12}>
+          <Header title={title} />
 
-        <FilterCard
-          onUserInput={handleChange}
-          titleFilter={nameFilter}
-          genreFilter={genreFilter}
-          voteAverageFilter={voteAverageFilter}
-        />
+          <FilterCard
+            onUserInput={handleChange}
+            titleFilter={nameFilter}
+            genreFilter={genreFilter}
+            voteAverageFilter={voteAverageFilter}
+          />
+        </Grid>
+        <Grid container sx={{flex: "1 1 500px"}}>
+          <MovieList action={action} movies={displayedMovies}></MovieList>
+        </Grid>
       </Grid>
-      <Grid container sx={{flex: "1 1 500px"}}>
-        <MovieList action={action} movies={displayedMovies}></MovieList>
-      </Grid>
-    </Grid>
+    </PageContainer>
   );
 }
 export default MovieListPageTemplate;
