@@ -24,7 +24,7 @@ export const getGenre = async () => {
     return await response.json();
 };
 
-export const getUpcoming = async (id) => {
+export const getUpcoming = async () => {
     const response = await fetch(
         `https://api.themoviedb.org/3/movie/upcoming?api_key=${process.env.TMDB_KEY}&language=en-US&page=1`
     );
@@ -36,7 +36,7 @@ export const getUpcoming = async (id) => {
     return await response.json();
 };
 
-export const getPopular = async (id) => {
+export const getPopular = async () => {
     const response = await fetch(
         `https://api.themoviedb.org/3/movie/popular?api_key=${process.env.TMDB_KEY}&language=en-US&page=1`
     );
@@ -48,7 +48,7 @@ export const getPopular = async (id) => {
     return await response.json();
 };
 
-export const getNowPlaying = async (id) => {
+export const getNowPlaying = async () => {
     const response = await fetch(
         `https://api.themoviedb.org/3/movie/now_playing?api_key=${process.env.TMDB_KEY}&language=en-US&page=1`
     );
@@ -60,7 +60,7 @@ export const getNowPlaying = async (id) => {
     return await response.json();
 }
 
-export const getTopRated = async (id) => {
+export const getTopRated = async () => {
     const response = await fetch(
         `https://api.themoviedb.org/3/movie/top_rated?api_key=${process.env.TMDB_KEY}&language=en-US&page=1`
     );
@@ -101,6 +101,19 @@ export const getMovie = async (id) => {
   export const getMovieVideos = async (id) => {
     const response = await fetch(
       `https://api.themoviedb.org/3/movie/${id}/videos?api_key=${process.env.TMDB_KEY}`
+    );
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.status_message || "Something went wrong");
+    }
+    
+    return await response.json();
+  };
+
+  export const getMovieReviews = async (id) => {
+    const response = await fetch(
+      `https://api.themoviedb.org/3/movie/${id}/reviews?api_key=${process.env.TMDB_KEY}`
     );
     
     if (!response.ok) {
