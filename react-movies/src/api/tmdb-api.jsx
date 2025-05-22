@@ -82,7 +82,7 @@ export const getNowPlayingMovies = () => {
 
 export const getTopRatedMovies = () => {
   return fetch(
-    `https://api.themoviedb.org/3/movie/top_rated?api_key=${import.meta.env.TMDB_KEY}&language=en-US&page=1&adult=false`
+    `http://localhost:8080/api/movies/top_rated`
   ).then((response) => {
     if (!response.ok) {
       return response.json().then((error) => {
