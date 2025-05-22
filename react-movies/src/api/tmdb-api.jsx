@@ -126,24 +126,38 @@ export const getMovieImages = async (args) => {
   return await response.json();
 };
 
+export const getMovieVideos = async (args) => {
+  console.log(args);
+  const [, idPart] = args.queryKey;
+  const { id } = idPart;
+  
+  const response = await fetch(`http://localhost:8080/api/movies/${id}/videos`);
+  
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.status_message || "Something went wrong");
+  }
+  
+  return await response.json();
+};
 
-  // export const getMovieImages = ({ queryKey }) => {
-  //   const [, idPart] = queryKey;
-  //   const { id } = idPart;
-  //   return fetch(
-  //     `https://api.themoviedb.org/3/movie/${id}/images?api_key=${import.meta.env.TMDB_KEY}`
-  //   ).then( (response) => {
-  //     if (!response.ok) {
-  //       return response.json().then((error) => {
-  //         throw new Error(error.status_message || "Something went wrong");
-  //       });
-  //     }
-  //     return response.json();
-  //   })
-  //   .catch((error) => {
-  //     throw error
-  //  });
-  // };
+// export const getMovieVideos = ({ queryKey }) => {
+//   const [, idPart] = queryKey;
+//   const { id } = idPart;
+//   return fetch(
+//     `https://api.themoviedb.org/3/movie/${id}/videos?api_key=${import.meta.env.TMDB_KEY}`
+//   ).then( (response) => {
+//     if (!response.ok) {
+//       return response.json().then((error) => {
+//         throw new Error(error.status_message || "Something went wrong");
+//       });
+//     }
+//     return response.json();
+//   })
+//   .catch((error) => {
+//     throw error
+//  });
+// };
 
 
   export const getMovieReviews = ({ queryKey }) => {
@@ -151,24 +165,6 @@ export const getMovieImages = async (args) => {
     const { id } = idPart;
     return fetch(
       `https://api.themoviedb.org/3/movie/${id}/reviews?api_key=${import.meta.env.TMDB_KEY}`
-    ).then( (response) => {
-      if (!response.ok) {
-        return response.json().then((error) => {
-          throw new Error(error.status_message || "Something went wrong");
-        });
-      }
-      return response.json();
-    })
-    .catch((error) => {
-      throw error
-   });
-  };
-
-  export const getMovieVideos = ({ queryKey }) => {
-    const [, idPart] = queryKey;
-    const { id } = idPart;
-    return fetch(
-      `https://api.themoviedb.org/3/movie/${id}/videos?api_key=${import.meta.env.TMDB_KEY}`
     ).then( (response) => {
       if (!response.ok) {
         return response.json().then((error) => {
