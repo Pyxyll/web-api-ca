@@ -36,7 +36,7 @@ export const getGenres = () => {
 
 export const getUpcommingMovies = () => {
   return fetch(
-    `https://api.themoviedb.org/3/movie/upcoming?api_key=${import.meta.env.TMDB_KEY}&language=en-US&page=1`
+    `http://localhost:8080/api/movies/upcoming`
   ).then((response) => {
     if (!response.ok) {
       return response.json().then((error) => {
@@ -231,3 +231,28 @@ export const getMovie = (args) => {
       throw error;
     });
   };
+
+  // USERS
+  
+
+export const login = async (username, password) => {
+  const response = await fetch('http://localhost:8080/api/users', {
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      method: 'post',
+      body: JSON.stringify({ username: username, password: password })
+  });
+  return response.json();
+};
+
+export const signup = async (username, password) => {
+  const response = await fetch('http://localhost:8080/api/users?action=register', {
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      method: 'post',
+      body: JSON.stringify({ username: username, password: password })
+  });
+  return response.json();
+};

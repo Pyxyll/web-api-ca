@@ -11,12 +11,13 @@ import PopularMoviesPage from './pages/popularMoviesPage'
 import NowPlayingMoviesPage from './pages/nowPlayingMoviesPage'
 import TopRatedMoviesPage from './pages/topRatedMoviesPage'
 import PersonPage from './pages/personPage'
+import LoginPage from "./pages/loginPage";
+import SignupPage from "./pages/signupPage";
 import SiteHeader from './components/siteHeader'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import MoviesContextProvider from "./contexts/moviesContext";
 import WatchListMoviesPage from "./pages/WatchListMoviesPage";
-
 
 
 const queryClient = new QueryClient({
@@ -51,6 +52,8 @@ const App = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="*" element={ <Navigate to="/" /> } />
             <Route path="/reviews/form" element={ <AddMovieReviewPage /> } />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
           </Routes>
         </MoviesContextProvider>
       </BrowserRouter>

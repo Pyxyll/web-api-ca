@@ -16,7 +16,7 @@ const PageContainer = styled('div')(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     maxWidth: '95%',
     padding: '0 8px',
-  }
+  },
 }));
 
 function MovieListPageTemplate({ movies, title, action }) {
