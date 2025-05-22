@@ -31,9 +31,6 @@ export const getGenres = () => {
  });
 };
 
-
-// old
-
 export const getUpcommingMovies = () => {
   return fetch(
     `http://localhost:8080/api/movies/upcoming`
@@ -50,9 +47,10 @@ export const getUpcommingMovies = () => {
   });
 };
 
+// old
 export const getPopularMovies = () => {
   return fetch(
-    `https://api.themoviedb.org/3/movie/popular?api_key=${import.meta.env.TMDB_KEY}&language=en-US&page=1&adult=false`
+    `http://localhost:8080/api/movies/popular`
   ).then((response) => {
     if (!response.ok) {
       return response.json().then((error) => {
