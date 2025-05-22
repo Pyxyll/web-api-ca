@@ -66,7 +66,7 @@ export const getPopularMovies = () => {
 
 export const getNowPlayingMovies = () => {
   return fetch(
-    `https://api.themoviedb.org/3/movie/now_playing?api_key=${import.meta.env.TMDB_KEY}&language=en-US&page=1&adult=false`
+    `http://localhost:8080/api/movies/now_playing`
   ).then((response) => {
     if (!response.ok) {
       return response.json().then((error) => {
