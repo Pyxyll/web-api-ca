@@ -224,24 +224,31 @@ export const getPersonMovies = async (args) => {
   // USERS
   
 
-export const login = async (username, password) => {
-  const response = await fetch('http://localhost:8080/api/users', {
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      method: 'post',
-      body: JSON.stringify({ username: username, password: password })
-  });
-  return response.json();
-};
-
-export const signup = async (username, password) => {
-  const response = await fetch('http://localhost:8080/api/users?action=register', {
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      method: 'post',
-      body: JSON.stringify({ username: username, password: password })
-  });
-  return response.json();
-};
+  export const login = async (username, password) => {
+    const response = await fetch('http://localhost:8080/api/users', {
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        method: 'post',
+        body: JSON.stringify({ username: username, password: password })
+    });
+    return response.json();
+  };
+  
+  export const signup = async (formData) => {
+    // FormData automatically handles multipart/form-data
+    const response = await fetch('http://localhost:8080/api/users?action=register', {
+        method: 'post',
+        body: formData // Don't set Content-Type header for FormData
+    });
+    return response.json();
+  };
+  
+ // Get user profile
+  // export const getUserProfile = async (username) => {
+  //   const response = await fetch(`http://localhost:8080/api/users/profile/${username}`);
+  //   if (!response.ok) {
+  //     throw new Error('Failed to fetch user profile');
+  //   }
+  //   return response.json();
+  // };

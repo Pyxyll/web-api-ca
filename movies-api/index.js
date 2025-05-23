@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+dotenv.config();
 import express from 'express';
 import usersRouter from './api/users';
 import moviesRouter from './api/movies';
@@ -7,7 +8,7 @@ import authenticate from './authenticate';
 import './db';
 import cors from 'cors';
 
-dotenv.config();
+
 
 const errHandler = (err, req, res, next) => {
   /* if the error in development then send stack trace to display whole error,

@@ -1,34 +1,34 @@
 import express from 'express';
-import User from './userModel';
+import User from './userModel.js';
 import asyncHandler from 'express-async-handler';
 import jwt from 'jsonwebtoken';
+import { upload, uploadImageToCloudinary, deleteImage } from '../cloudinary.js';
 
-const router = express.Router(); // eslint-disable-line
+const router = express.Router();
 
 // Get all users
 router.get('/', async (req, res) => {
-    const users = await User.find();
+    const users = await User.find().select('-password');
     res.status(200).json(users);
 });
 
 // register(Create)/Authenticate User
-router.post('/', asyncHandler(async (req, res) => {
+router.post('/', upload.single('profileImage'), asyncHandler(async (req, res) => {
     try {
         if (!req.body.username || !req.body.password) {
             return res.status(400).json({ success: false, msg: 'Username and password are required.' });
         }
+        
         if (req.query.action === 'register') {
             await registerUser(req, res);
         } else {
             await authenticateUser(req, res);
         }
     } catch (error) {
-        // Log the error and return a generic error message
         console.error(error);
         res.status(500).json({ success: false, msg: 'Internal server error.' });
     }
 }));
-
 
 async function registerUser(req, res) {
     // Password validation logic
@@ -40,9 +40,47 @@ async function registerUser(req, res) {
         });
     }
 
-    // Add input validation logic here
-    await User.create(req.body);
-    res.status(201).json({ success: true, msg: 'User successfully created.' });
+    let uploadedImage = null;
+
+    try {
+        // Prepare user data
+        const userData = {
+            username: req.body.username,
+            password: req.body.password
+        };
+
+        // Upload image to Cloudinary if provided
+        if (req.file) {
+            uploadedImage = await uploadImageToCloudinary(req.file.buffer);
+            userData.profileImage = {
+                url: uploadedImage.secure_url,
+                publicId: uploadedImage.public_id
+            };
+        }
+
+        // Create user
+        const user = await User.create(userData);
+        
+        res.status(201).json({ 
+            success: true, 
+            msg: 'User successfully created.',
+            user: {
+                username: user.username,
+                profileImage: user.profileImage
+            }
+        });
+    } catch (error) {
+        // Clean up uploaded image on error
+        if (uploadedImage) {
+            await deleteImage(uploadedImage.public_id);
+        }
+        
+        if (error.code === 11000) {
+            res.status(400).json({ success: false, msg: 'Username already exists.' });
+        } else {
+            throw error;
+        }
+    }
 }
 
 async function authenticateUser(req, res) {
@@ -54,9 +92,26 @@ async function authenticateUser(req, res) {
     const isMatch = await user.comparePassword(req.body.password);
     if (isMatch) {
         const token = jwt.sign({ username: user.username }, process.env.SECRET);
-        res.status(200).json({ success: true, token: 'BEARER ' + token });
+        res.status(200).json({ 
+            success: true, 
+            token: 'BEARER ' + token,
+            user: {
+                username: user.username,
+                profileImage: user.profileImage
+            }
+        });
     } else {
         res.status(401).json({ success: false, msg: 'Wrong password.' });
     }
 }
+
+// Get user profile
+// router.get('/profile/:username', asyncHandler(async (req, res) => {
+//     const user = await User.findByUserName(req.params.username).select('-password');
+//     if (!user) {
+//         return res.status(404).json({ success: false, msg: 'User not found.' });
+//     }
+//     res.status(200).json({ success: true, user });
+// }));
+
 export default router;
