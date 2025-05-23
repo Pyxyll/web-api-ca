@@ -12,14 +12,16 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  Avatar,
+  IconButton
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { CheckCircle, Cancel } from '@mui/icons-material';
+import { CheckCircle, Cancel, PhotoCamera, AccountCircle } from '@mui/icons-material';
 import { useNavigate } from 'react-router';
 import { signup } from '../api/tmdb-api';
 
-const StyledContainer = styled(Container)(({ theme }) => ({
+const StyledContainer = styled(Container)(( ) => ({
   minHeight: '100vh',
   display: 'flex',
   alignItems: 'center',
@@ -28,7 +30,7 @@ const StyledContainer = styled(Container)(({ theme }) => ({
   padding: '20px',
 }));
 
-const StyledPaper = styled(Paper)(({ theme }) => ({
+const StyledPaper = styled(Paper)(() => ({
   padding: '40px',
   borderRadius: '24px',
   background: 'rgba(15, 23, 42, 0.8)',
@@ -51,7 +53,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   }
 }));
 
-const StyledTextField = styled(TextField)(({ theme }) => ({
+const StyledTextField = styled(TextField)(( ) => ({
   '& .MuiOutlinedInput-root': {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: '12px',
@@ -76,7 +78,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   },
 }));
 
-const StyledButton = styled(Button)(({ theme }) => ({
+const StyledButton = styled(Button)(() => ({
   padding: '12px 24px',
   borderRadius: '12px',
   background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
@@ -97,13 +99,56 @@ const StyledButton = styled(Button)(({ theme }) => ({
   }
 }));
 
+const ProfileImageContainer = styled(Box)(() => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  marginBottom: '24px',
+  position: 'relative',
+}));
+
+const ProfileAvatar = styled(Avatar)(() => ({
+  width: 120,
+  height: 120,
+  border: '3px solid rgba(255, 255, 255, 0.2)',
+  boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)',
+  marginBottom: '16px',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'scale(1.05)',
+    borderColor: '#6366f1',
+  }
+}));
+
+const UploadButton = styled(IconButton)(() => ({
+  position: 'absolute',
+  bottom: 10,
+  right: 'calc(50% - 70px)',
+  backgroundColor: '#6366f1',
+  color: '#ffffff',
+  width: 40,
+  height: 40,
+  border: '3px solid rgba(255, 255, 255, 0.2)',
+  '&:hover': {
+    backgroundColor: '#5855eb',
+    transform: 'scale(1.1)',
+  }
+}));
+
+const HiddenInput = styled('input')({
+  display: 'none',
+});
+
 const SignupPage = () => {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
     confirmPassword: ''
   });
+  const [profileImage, setProfileImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
@@ -124,6 +169,43 @@ const SignupPage = () => {
     // Clear messages when user starts typing
     if (error) setError('');
     if (success) setSuccess('');
+  };
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setError('Please select a valid image file');
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image size should be less than 5MB');
+      return;
+    }
+
+    setImageLoading(true);
+    setError('');
+
+    try {
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+
+      // Prepare for upload
+      setProfileImage(file);
+    } catch (err) {
+      setError('Error processing image');
+      console.error('Image processing error:', err);
+    } finally {
+      setImageLoading(false);
+    }
   };
 
   const validateForm = () => {
@@ -155,7 +237,16 @@ const SignupPage = () => {
     setError('');
 
     try {
-      const response = await signup(formData.username, formData.password);
+      // Create FormData for multipart upload
+      const signupData = new FormData();
+      signupData.append('username', formData.username);
+      signupData.append('password', formData.password);
+      
+      if (profileImage) {
+        signupData.append('profileImage', profileImage);
+      }
+
+      const response = await signup(signupData);
       
       if (response.success) {
         setSuccess('Account created successfully! Redirecting to login...');
@@ -235,6 +326,36 @@ const SignupPage = () => {
           )}
 
           <Box component="form" onSubmit={handleSubmit}>
+            {/* Profile Image Upload */}
+            <ProfileImageContainer>
+              <ProfileAvatar 
+                src={imagePreview} 
+                sx={{ 
+                  bgcolor: imagePreview ? 'transparent' : 'rgba(99, 102, 241, 0.2)',
+                }}
+              >
+                {!imagePreview && <AccountCircle sx={{ fontSize: 60, color: 'rgba(255, 255, 255, 0.7)' }} />}
+              </ProfileAvatar>
+              
+              <HiddenInput
+                accept="image/*"
+                id="profile-image-upload"
+                type="file"
+                onChange={handleImageChange}
+                disabled={loading || imageLoading}
+              />
+              
+              <label htmlFor="profile-image-upload">
+                <UploadButton component="span" disabled={loading || imageLoading}>
+                  {imageLoading ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    <PhotoCamera />
+                  )}
+                </UploadButton>
+              </label>
+            </ProfileImageContainer>
+
             <StyledTextField
               fullWidth
               label="Username"
@@ -303,7 +424,7 @@ const SignupPage = () => {
             <StyledButton
               type="submit"
               fullWidth
-              disabled={loading}
+              disabled={loading || imageLoading}
               sx={{ mt: 3, mb: 2 }}
             >
               {loading ? (
