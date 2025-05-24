@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router';
-import { login } from '../api/tmdb-api';
+import { useAuth } from '../contexts/AuthContext';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   minHeight: '100vh',
@@ -100,6 +100,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { authenticate } = useAuth();
 
   const handleChange = (e) => {
     setFormData({
@@ -115,22 +116,25 @@ const LoginPage = () => {
     setLoading(true);
     setError('');
 
+    console.log("📝 Login form submitting for:", formData.username);
+
     try {
-      const response = await login(formData.username, formData.password);
+      // Use the AuthContext's authenticate function instead of direct API call
+      const result = await authenticate(formData.username, formData.password);
       
-      if (response.success) {
-        // Store token in localStorage
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('username', formData.username);
-        
-        // Redirect to home page
+      console.log("📝 Login form received result:", result);
+      
+      if (result.success) {
+        console.log("📝 Login successful! Navigating to home...");
+
         navigate('/');
       } else {
-        setError(response.msg || 'Login failed');
+        console.log("📝 Login failed:", result.message);
+        setError(result.message || 'Login failed');
       }
     } catch (err) {
+      console.error('📝 Login error:', err);
       setError('Network error. Please try again.');
-      console.error('Login error:', err);
     } finally {
       setLoading(false);
     }

@@ -18,7 +18,7 @@ import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import MoviesContextProvider from "./contexts/moviesContext";
 import WatchListMoviesPage from "./pages/WatchListMoviesPage";
-
+import AuthContextProvider from "./contexts/authContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,6 +35,7 @@ const queryClient = new QueryClient({
 
 const App = () => {
   return (
+    <AuthContextProvider>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <SiteHeader />
@@ -59,6 +60,8 @@ const App = () => {
       </BrowserRouter>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
+    </AuthContextProvider>
+
   );
 };
 

@@ -106,12 +106,24 @@ async function authenticateUser(req, res) {
 }
 
 // Get user profile
-// router.get('/profile/:username', asyncHandler(async (req, res) => {
-//     const user = await User.findByUserName(req.params.username).select('-password');
-//     if (!user) {
-//         return res.status(404).json({ success: false, msg: 'User not found.' });
-//     }
-//     res.status(200).json({ success: true, user });
-// }));
+router.get('/profile/:username', asyncHandler(async (req, res) => {
+    console.log('Getting profile for username:', req.params.username);
+    
+    const user = await User.findByUserName(req.params.username).select('-password');
+    if (!user) {
+        console.log('User not found:', req.params.username);
+        return res.status(404).json({ success: false, msg: 'User not found.' });
+    }
+    
+    console.log('User found:', user.username);
+    res.status(200).json({ 
+        success: true, 
+        user: {
+            username: user.username,
+            profileImage: user.profileImage,
+            createdAt: user.createdAt
+        }
+    });
+}));
 
 export default router;

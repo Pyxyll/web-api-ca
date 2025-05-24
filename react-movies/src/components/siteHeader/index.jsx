@@ -1,37 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
+import Box from "@mui/material/Box";
 import { useNavigate } from "react-router";
 import { styled } from '@mui/material/styles';
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { useAuth } from "../../contexts/AuthContext";
+import UserAvatar from "../userAvatar";
 
-const FloatingAppBar = styled(AppBar)(({ theme, isScrolled }) => ({
+const FloatingAppBar = styled(AppBar)(({ theme }) => ({
   position: 'fixed',
-  top: isScrolled ? '16px' : '24px',
+  top: '24px',
   left: '50%',
   transform: 'translateX(-50%)',
-  width: isScrolled ? 'min(calc(100% - 32px), 1000px)' : '80%',
-  borderRadius: isScrolled ? '20px' : '24px',
+  width: '80%',
+  borderRadius: '24px',
   backdropFilter: 'blur(20px) saturate(180%)',
-  backgroundColor: isScrolled 
-    ? 'rgba(15, 23, 42, 0.8)' 
-    : 'rgba(15, 23, 42, 0.85)',
-  background: isScrolled 
-    ? 'rgba(15, 23, 42, 0.8)' 
-    : 'rgba(15, 23, 42, 0.85)',
-  boxShadow: isScrolled 
-    ? '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)' 
-    : '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 15px 20px -5px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+  backgroundColor: 'rgba(15, 23, 42, 0.85)',
+  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 15px 20px -5px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
   border: '1px solid rgba(255, 255, 255, 0.1)',
-  transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-  transformOrigin: 'center center',
   zIndex: theme.zIndex.appBar,
   '&::before': {
     content: '""',
@@ -40,68 +33,48 @@ const FloatingAppBar = styled(AppBar)(({ theme, isScrolled }) => ({
     left: 0,
     right: 0,
     bottom: 0,
-    background: isScrolled 
-      ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)'
-      : 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%)',
+    background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%)',
     borderRadius: 'inherit',
     pointerEvents: 'none',
   },
   [theme.breakpoints.down('sm')]: {
-    width: isScrolled ? 'calc(100% - 16px)' : '90%',
-    top: isScrolled ? '8px' : '12px',
-    borderRadius: isScrolled ? '16px' : '20px',
+    width: '90%',
+    top: '12px',
+    borderRadius: '20px',
   }
 }));
 
-const FloatingToolbar = styled(Toolbar)(({ theme, isScrolled }) => ({
-  minHeight: isScrolled ? '64px' : '80px',
-  padding: isScrolled ? '0 24px' : '0 40px',
-  transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+const FloatingToolbar = styled(Toolbar)(({ theme }) => ({
+  minHeight: '80px',
+  padding: '0 40px',
   position: 'relative',
   zIndex: 1,
   [theme.breakpoints.down('sm')]: {
-    minHeight: isScrolled ? '56px' : '72px',
-    padding: isScrolled ? '0 16px' : '0 24px',
+    minHeight: '72px',
+    padding: '0 24px',
   }
 }));
 
-const LogoContainer = styled('div')(({ theme, isScrolled }) => ({
+const LogoContainer = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: isScrolled ? '12px' : '16px',
+  gap: '16px',
   flexGrow: 1,
-  transition: 'gap 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
 }));
 
-const LogoImage = styled('img')(({ theme, isScrolled }) => ({
-  height: isScrolled ? '32px' : '40px',
+const LogoImage = styled('img')(({ theme }) => ({
+  height: '40px',
   width: 'auto',
-  transition: 'height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
   filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))',
   [theme.breakpoints.down('sm')]: {
-    height: isScrolled ? '28px' : '36px',
+    height: '36px',
   }
 }));
 
-const LogoText = styled(Typography)(({ theme, isScrolled }) => ({
-  fontSize: isScrolled ? '1.75rem' : '2.5rem',
-  fontWeight: 700,
-  background: 'linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%)',
-  backgroundClip: 'text',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  letterSpacing: '-0.025em',
-  transition: 'font-size 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-  textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-  [theme.breakpoints.down('sm')]: {
-    fontSize: isScrolled ? '1.5rem' : '2rem',
-  }
-}));
-
-const NavButton = styled(Button)(({ theme, isScrolled }) => ({
-  fontSize: isScrolled ? '0.875rem' : '1rem',
+const NavButton = styled(Button)(({ theme }) => ({
+  fontSize: '1rem',
   fontWeight: 500,
-  padding: isScrolled ? '8px 16px' : '12px 24px',
+  padding: '12px 24px',
   borderRadius: '12px',
   textTransform: 'none',
   color: 'rgba(255, 255, 255, 0.9)',
@@ -133,27 +106,15 @@ const NavButton = styled(Button)(({ theme, isScrolled }) => ({
   }
 }));
 
-const ModernIconButton = styled(IconButton)(({ theme, isScrolled }) => ({
-  color: 'rgba(255, 255, 255, 0.9)',
-  borderRadius: '12px',
-  padding: isScrolled ? '8px' : '10px',
-  transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-  '&:hover': {
-    color: '#ffffff',
-    backgroundColor: 'rgba(99, 102, 241, 0.2)',
-    transform: 'translateY(-1px)',
-    boxShadow: '0 8px 25px rgba(99, 102, 241, 0.3)',
-  }
-}));
-
 const ModernMenu = styled(Menu)(({ theme }) => ({
   '& .MuiPaper-root': {
     backgroundColor: 'rgba(15, 23, 42, 0.95)',
     backdropFilter: 'blur(20px) saturate(180%)',
     border: '1px solid rgba(255, 255, 255, 0.1)',
     borderRadius: '16px',
-    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',
+    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)',
     marginTop: '8px',
+    minWidth: '200px',
   },
   '& .MuiMenuItem-root': {
     color: 'rgba(255, 255, 255, 0.9)',
@@ -170,26 +131,29 @@ const ModernMenu = styled(Menu)(({ theme }) => ({
   }
 }));
 
-const Offset = styled('div')(({ theme, isScrolled }) => ({
-  height: isScrolled ? '96px' : '128px',
-  transition: 'height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+const Offset = styled('div')(({ theme }) => ({
+  height: '128px',
   [theme.breakpoints.down('sm')]: {
-    height: isScrolled ? '72px' : '96px',
+    height: '96px',
   }
 }));
 
 const SiteHeader = ({ history }) => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [isScrolled, setIsScrolled] = useState(false);
   const open = Boolean(anchorEl);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const { isAuthenticated, loading, user, userName } = useAuth();
   
   const navigate = useNavigate();
 
   const menuOptions = [
     { label: "Home", path: "/" },
+  ];
+
+  // Movie-specific menu items only shown when logged in
+  const movieMenuOptions = [
     { label: "Favorites", path: "/movies/favorites" },
     { label: "Upcoming", path: "/movies/upcoming" },
     { label: "Popular", path: "/movies/popular" },
@@ -198,15 +162,15 @@ const SiteHeader = ({ history }) => {
     { label: "Watch List", path: "/movies/watchlist" },
   ];
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      setIsScrolled(scrollTop > 50);
-    };
+  // Combine menu options based on auth status
+  const displayMenuOptions = isAuthenticated 
+    ? [...menuOptions, ...movieMenuOptions]
+    : menuOptions;
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // Add auth-specific menu items for mobile
+  const authMenuOptions = isAuthenticated 
+    ? displayMenuOptions 
+    : [...displayMenuOptions, { label: "Login", path: "/login" }, { label: "Sign Up", path: "/signup" }];
 
   const handleMenuSelect = (pageURL) => {
     setAnchorEl(null);
@@ -219,26 +183,26 @@ const SiteHeader = ({ history }) => {
 
   return (
     <>
-      <FloatingAppBar elevation={0} isScrolled={isScrolled}>
-        <FloatingToolbar isScrolled={isScrolled}>
-          <LogoContainer isScrolled={isScrolled}>
+      <FloatingAppBar elevation={0}>
+        <FloatingToolbar>
+          <LogoContainer>
             <LogoImage 
               src="/logo.svg" 
               alt="TMDB Client Logo" 
-              isScrolled={isScrolled}
             />
           </LogoContainer>
             {isMobile ? (
               <>
-                <ModernIconButton
+                <IconButton
                   aria-label="menu"
                   aria-controls="menu-appbar"
                   aria-haspopup="true"
                   onClick={handleMenu}
-                  isScrolled={isScrolled}
+                  color="inherit"
+                  size="medium"
                 >
                   <MenuIcon />
-                </ModernIconButton>
+                </IconButton>
                 <ModernMenu
                   id="menu-appbar"
                   anchorEl={anchorEl}
@@ -254,7 +218,7 @@ const SiteHeader = ({ history }) => {
                   open={open}
                   onClose={() => setAnchorEl(null)}
                 >
-                  {menuOptions.map((opt) => (
+                  {authMenuOptions.map((opt) => (
                     <MenuItem
                       key={opt.label}
                       onClick={() => handleMenuSelect(opt.path)}
@@ -265,21 +229,46 @@ const SiteHeader = ({ history }) => {
                 </ModernMenu>
               </>
             ) : (
-              <>
-                {menuOptions.map((opt) => (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {displayMenuOptions.map((opt) => (
                   <NavButton
                     key={opt.label}
                     onClick={() => handleMenuSelect(opt.path)}
-                    isScrolled={isScrolled}
                   >
                     {opt.label}
                   </NavButton>
                 ))}
-              </>
+                
+                {/* Auth Section */}
+                {isAuthenticated ? (
+                  <Box sx={{ ml: 2 }}>
+                    <UserAvatar size="medium" />
+                  </Box>
+                ) : (
+                  <Box sx={{ ml: 2, display: 'flex', gap: 1 }}>
+                    <NavButton
+                      onClick={() => handleMenuSelect("/login")}
+                    >
+                      Login
+                    </NavButton>
+                    <NavButton
+                      onClick={() => handleMenuSelect("/signup")}
+                      sx={{
+                        background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                        '&:hover': {
+                          background: 'linear-gradient(135deg, #5855eb 0%, #7c3aed 100%)',
+                        }
+                      }}
+                    >
+                      Sign Up
+                    </NavButton>
+                  </Box>
+                )}
+              </Box>
             )}
         </FloatingToolbar>
       </FloatingAppBar>
-      <Offset isScrolled={isScrolled} />
+      <Offset />
     </>
   );
 };

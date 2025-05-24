@@ -245,10 +245,10 @@ export const getPersonMovies = async (args) => {
   };
   
  // Get user profile
-  // export const getUserProfile = async (username) => {
-  //   const response = await fetch(`http://localhost:8080/api/users/profile/${username}`);
-  //   if (!response.ok) {
-  //     throw new Error('Failed to fetch user profile');
-  //   }
-  //   return response.json();
-  // };
+  export const getUserProfile = async (username) => {
+    const response = await fetch(`http://localhost:8080/api/users/profile/${username}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch user profile');
+    }
+    return response.json();
+  };
