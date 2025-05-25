@@ -3,6 +3,8 @@ import User from './userModel.js';
 import asyncHandler from 'express-async-handler';
 import jwt from 'jsonwebtoken';
 import { upload, uploadImageToCloudinary, deleteImage } from '../cloudinary.js';
+import UserMovies from '../userMovies/userMoviesModel.js';
+import authenticate from '../../authenticate/index.js';
 
 const router = express.Router();
 
@@ -125,5 +127,142 @@ router.get('/profile/:username', asyncHandler(async (req, res) => {
         }
     });
 }));
+
+router.get('/favorites', authenticate, asyncHandler(async (req, res) => {
+    const userMovies = await UserMovies.getOrCreateUserMovies(req.user._id);
+    const favoriteIds = userMovies.getFavoriteIds();
+    
+    res.status(200).json({ 
+        success: true, 
+        favorites: favoriteIds
+    });
+}));
+
+router.post('/favorites/:movieId', authenticate, asyncHandler(async (req, res) => {
+    const movieId = parseInt(req.params.movieId);
+    
+    const userMovies = await UserMovies.getOrCreateUserMovies(req.user._id);
+    await userMovies.addToFavorites(movieId);
+    
+    res.status(200).json({ 
+        success: true, 
+        message: 'Movie added to favorites',
+        favorites: userMovies.getFavoriteIds()
+    });
+}));
+
+router.delete('/favorites/:movieId', authenticate, asyncHandler(async (req, res) => {
+    const movieId = parseInt(req.params.movieId);
+    
+    const userMovies = await UserMovies.getOrCreateUserMovies(req.user._id);
+    await userMovies.removeFromFavorites(movieId);
+    
+    res.status(200).json({ 
+        success: true, 
+        message: 'Movie removed from favorites',
+        favorites: userMovies.getFavoriteIds()
+    });
+}));
+
+router.get('/favorites/:movieId/check', authenticate, asyncHandler(async (req, res) => {
+    const movieId = parseInt(req.params.movieId);
+    
+    const userMovies = await UserMovies.getOrCreateUserMovies(req.user._id);
+    const isFavorite = userMovies.isFavorite(movieId);
+    
+    res.status(200).json({ 
+        success: true, 
+        isFavorite
+    });
+}));
+
+
+router.get('/watchlist', authenticate, asyncHandler(async (req, res) => {
+    const userMovies = await UserMovies.getOrCreateUserMovies(req.user._id);
+    const watchlistIds = userMovies.getWatchlistIds();
+    
+    res.status(200).json({ 
+        success: true, 
+        watchlist: watchlistIds
+    });
+}));
+
+router.post('/watchlist/:movieId', authenticate, asyncHandler(async (req, res) => {
+    const movieId = parseInt(req.params.movieId);
+    
+    const userMovies = await UserMovies.getOrCreateUserMovies(req.user._id);
+    await userMovies.addToWatchlist(movieId);
+    
+    res.status(200).json({ 
+        success: true, 
+        message: 'Movie added to watchlist',
+        watchlist: userMovies.getWatchlistIds()
+    });
+}));
+
+router.delete('/watchlist/:movieId', authenticate, asyncHandler(async (req, res) => {
+    const movieId = parseInt(req.params.movieId);
+    
+    const userMovies = await UserMovies.getOrCreateUserMovies(req.user._id);
+    await userMovies.removeFromWatchlist(movieId);
+    
+    res.status(200).json({ 
+        success: true, 
+        message: 'Movie removed from watchlist',
+        watchlist: userMovies.getWatchlistIds()
+    });
+}));
+
+router.get('/reviews', authenticate, asyncHandler(async (req, res) => {
+    const userMovies = await UserMovies.getOrCreateUserMovies(req.user._id);
+    const reviewsObj = userMovies.getReviewsObject();
+    
+    res.status(200).json({ 
+        success: true, 
+        reviews: reviewsObj
+    });
+}));
+
+router.post('/reviews/:movieId', authenticate, asyncHandler(async (req, res) => {
+    const movieId = parseInt(req.params.movieId);
+    const { rating, content } = req.body;
+    
+    if (!rating || !content) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Rating and content are required' 
+        });
+    }
+    
+    if (rating < 1 || rating > 5) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Rating must be between 1 and 5' 
+        });
+    }
+    
+    const userMovies = await UserMovies.getOrCreateUserMovies(req.user._id);
+    await userMovies.addOrUpdateReview(movieId, rating, content);
+    
+    res.status(200).json({ 
+        success: true, 
+        message: 'Review saved successfully',
+        reviews: userMovies.getReviewsObject()
+    });
+}));
+
+router.delete('/reviews/:movieId', authenticate, asyncHandler(async (req, res) => {
+    const movieId = parseInt(req.params.movieId);
+    
+    const userMovies = await UserMovies.getOrCreateUserMovies(req.user._id);
+    await userMovies.removeReview(movieId);
+    
+    res.status(200).json({ 
+        success: true, 
+        message: 'Review deleted successfully',
+        reviews: userMovies.getReviewsObject()
+    });
+}));
+
 
 export default router;

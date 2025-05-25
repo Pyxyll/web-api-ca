@@ -1,3 +1,14 @@
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token');
+  return token ? {
+    'Authorization': token,
+    'Content-Type': 'application/json'
+  } : {
+    'Content-Type': 'application/json'
+  };
+};
+
+
 export const getMovies = () => {
   return fetch(
     `http://localhost:8080/api/movies/discover`
@@ -250,5 +261,107 @@ export const getPersonMovies = async (args) => {
     if (!response.ok) {
       throw new Error('Failed to fetch user profile');
     }
+    return response.json();
+  };
+
+  export const getUserFavorites = async () => {
+    const response = await fetch('http://localhost:8080/api/users/favorites', {
+      headers: getAuthHeaders()
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch favorites');
+    }
+    
+    return response.json();
+  };
+  
+  export const addToFavorites = async (movieId) => {
+    const response = await fetch(`http://localhost:8080/api/users/favorites/${movieId}`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to add to favorites');
+    }
+    
+    return response.json();
+  };
+  
+  export const removeFromFavorites = async (movieId) => {
+    const response = await fetch(`http://localhost:8080/api/users/favorites/${movieId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to remove from favorites');
+    }
+    
+    return response.json();
+  };
+  
+  export const getUserWatchlist = async () => {
+    const response = await fetch('http://localhost:8080/api/users/watchlist', {
+      headers: getAuthHeaders()
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch watchlist');
+    }
+    
+    return response.json();
+  };
+  
+  export const addToWatchlist = async (movieId) => {
+    const response = await fetch(`http://localhost:8080/api/users/watchlist/${movieId}`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to add to watchlist');
+    }
+    
+    return response.json();
+  };
+  
+  export const removeFromWatchlist = async (movieId) => {
+    const response = await fetch(`http://localhost:8080/api/users/watchlist/${movieId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to remove from watchlist');
+    }
+    
+    return response.json();
+  };
+  
+  export const getUserReviews = async () => {
+    const response = await fetch('http://localhost:8080/api/users/reviews', {
+      headers: getAuthHeaders()
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch reviews');
+    }
+    
+    return response.json();
+  };
+  
+  export const addReview = async (movieId, rating, content) => {
+    const response = await fetch(`http://localhost:8080/api/users/reviews/${movieId}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ rating, content })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to add review');
+    }
+    
     return response.json();
   };
