@@ -1,8 +1,7 @@
-// components/UserAvatar.jsx
 import React, { useState } from 'react';
 import { Avatar, Menu, MenuItem, Typography, Divider, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { AccountCircle, Logout, Person } from '@mui/icons-material';
+import { AccountCircle, Logout, Person, Favorite, PlaylistPlay } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router';
 
@@ -65,13 +64,23 @@ const UserAvatar = ({ size = 'medium', showMenu = true }) => {
 
   const handleProfile = () => {
     handleClose();
-    navigate('/profile'); // Navigate to profile page
+    navigate('/profile');
   };
 
   const handleLogout = () => {
     handleClose();
     signout();
-    navigate('/');
+    navigate('/login');
+  };
+
+  const handleFavorites = () => {
+    handleClose();
+    navigate('/movies/favorites');
+  };
+
+  const handleWatchlist = () => {
+    handleClose();
+    navigate('/movies/watchlist');
   };
 
   if (!isAuthenticated) {
@@ -113,10 +122,24 @@ const UserAvatar = ({ size = 'medium', showMenu = true }) => {
             </Typography>
           </Box>
           <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+          
           <MenuItem onClick={handleProfile}>
             <Person sx={{ mr: 2, fontSize: 18 }} />
             Profile
           </MenuItem>
+          
+          <MenuItem onClick={handleFavorites}>
+            <Favorite sx={{ mr: 2, fontSize: 18, color: '#ef4444' }} />
+            Favorites
+          </MenuItem>
+          
+          <MenuItem onClick={handleWatchlist}>
+            <PlaylistPlay sx={{ mr: 2, fontSize: 18, color: '#10b981' }} />
+            Watch List
+          </MenuItem>
+          
+          <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+          
           <MenuItem onClick={handleLogout}>
             <Logout sx={{ mr: 2, fontSize: 18 }} />
             Logout

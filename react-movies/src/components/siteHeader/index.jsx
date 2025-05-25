@@ -152,14 +152,11 @@ const SiteHeader = ({ history }) => {
     { label: "Home", path: "/" },
   ];
 
-  // Movie-specific menu items only shown when logged in
   const movieMenuOptions = [
-    { label: "Favorites", path: "/movies/favorites" },
     { label: "Upcoming", path: "/movies/upcoming" },
     { label: "Popular", path: "/movies/popular" },
     { label: "In Theaters", path: "/movies/now_playing" },
     { label: "Top Rated", path: "/movies/top_rated" },
-    { label: "Watch List", path: "/movies/watchlist" },
   ];
 
   // Combine menu options based on auth status
