@@ -6,6 +6,7 @@ import { AccountCircle, Logout, Person } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router';
 
+
 const StyledAvatar = styled(Avatar)(({ theme, size = 'medium' }) => ({
   width: size === 'small' ? 32 : size === 'large' ? 56 : 40,
   height: size === 'small' ? 32 : size === 'large' ? 56 : 40,
