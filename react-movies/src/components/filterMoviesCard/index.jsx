@@ -13,10 +13,111 @@ import Box from "@mui/material/Box";
 import StarIcon from "@mui/icons-material/Star";
 import TuneIcon from "@mui/icons-material/Tune";
 import Stack from "@mui/material/Stack";
-import img from "../../images/hero.jpg";
+import { styled } from '@mui/material/styles';
 import { getGenres } from "../../api/tmdb-api";
 import { useQuery } from '@tanstack/react-query';
 import Spinner from '../spinner';
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  position: 'relative',
+  borderRadius: '24px',
+  background: 'rgba(15, 23, 42, 0.8)',
+  backdropFilter: 'blur(20px) saturate(180%)',
+  border: '1px solid rgba(255, 255, 255, 0.1)',
+  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6)',
+  marginBottom: '40px',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'translateY(-2px)',
+    boxShadow: '0 32px 64px -12px rgba(0, 0, 0, 0.7)',
+  },
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+    borderRadius: 'inherit',
+    pointerEvents: 'none',
+  }
+}));
+
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  '& .MuiFilledInput-root': {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: '12px',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      backgroundColor: 'rgba(255, 255, 255, 0.08)',
+      borderColor: 'rgba(255, 255, 255, 0.2)',
+    },
+    '&.Mui-focused': {
+      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      borderColor: '#6366f1',
+      boxShadow: '0 0 0 2px rgba(99, 102, 241, 0.2)',
+    },
+    '&:before, &:after': {
+      display: 'none',
+    },
+  },
+  '& .MuiInputLabel-root': {
+    color: 'rgba(255, 255, 255, 0.7)',
+    '&.Mui-focused': {
+      color: '#6366f1',
+    },
+  },
+  '& .MuiFilledInput-input': {
+    color: 'white',
+  },
+}));
+
+const StyledFormControl = styled(FormControl)(({ theme }) => ({
+  '& .MuiInputBase-root': {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: '12px',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      backgroundColor: 'rgba(255, 255, 255, 0.08)',
+      borderColor: 'rgba(255, 255, 255, 0.2)',
+    },
+    '&.Mui-focused': {
+      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      borderColor: '#6366f1',
+      boxShadow: '0 0 0 2px rgba(99, 102, 241, 0.2)',
+    },
+    '&:before, &:after': {
+      display: 'none',
+    },
+  },
+  '& .MuiInputLabel-root': {
+    color: 'rgba(255, 255, 255, 0.7)',
+    '&.Mui-focused': {
+      color: '#6366f1',
+    },
+  },
+  '& .MuiSelect-select': {
+    color: 'white',
+  },
+  '& .MuiSelect-icon': {
+    color: 'rgba(255, 255, 255, 0.7)',
+  },
+}));
+
+const SliderContainer = styled(Box)(({ theme }) => ({
+  padding: '20px',
+  borderRadius: '12px',
+  background: 'rgba(255, 255, 255, 0.05)',
+  border: '1px solid rgba(255, 255, 255, 0.1)',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    background: 'rgba(255, 255, 255, 0.08)',
+    transform: 'translateY(-1px)',
+  }
+}));
 
 const formControl = {
   minWidth: "100%",
@@ -36,6 +137,7 @@ export default function FilterMoviesCard(props) {
   if (isError) {
     return <h1>{error.message}</h1>;
   }
+  
   const genres = data.genres;
   if (genres[0].name !== "All"){
     genres.unshift({ id: "0", name: "All" });
@@ -60,40 +162,13 @@ export default function FilterMoviesCard(props) {
 
   // Function to get the color for the rating
   const getRatingColor = (value) => {
-    if (value <= 3) return '#f44336';
-    if (value <= 7) return '#ff9800';
-    return '#4caf50';
+    if (value <= 3) return '#ef4444';
+    if (value <= 7) return '#f59e0b';
+    return '#10b981';
   };
 
   return (
-    <Card
-      sx={{
-        position: "relative",
-        borderRadius: 4,
-        boxShadow: "0 8px 32px rgba(31, 38, 135, 0.37)",
-        overflow: "hidden",
-        transition: "transform 0.3s ease",
-        "&:hover": {
-          transform: "translateY(-5px)",
-        },
-        backgroundImage: `url(${img})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        height: "100%",
-        marginBottom: 5,
-        "&::before": {
-          content: '""',
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: "linear-gradient(135deg, rgba(63,81,181,0.85) 0%, rgba(33,150,243,0.85) 100%)",
-          zIndex: 0,
-        }
-      }}
-      variant="outlined"
-    >
+    <StyledCard variant="outlined">
       <CardContent 
         sx={{ 
           padding: 3,
@@ -112,32 +187,27 @@ export default function FilterMoviesCard(props) {
             display: "flex",
             alignItems: "center",
             gap: 1,
-            fontWeight: "bold",
+            fontWeight: 700,
             marginBottom: 3,
-            color: "white",
-            textShadow: "0px 2px 4px rgba(0,0,0,0.3)",
+            background: 'linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
           }}
         >
-          <TuneIcon fontSize="medium" />
+          <TuneIcon 
+            fontSize="medium" 
+            sx={{ 
+              color: '#6366f1',
+              filter: 'drop-shadow(0 2px 4px rgba(99, 102, 241, 0.3))'
+            }} 
+          />
           Movie Filters
         </Typography>
 
         <Stack spacing={3} sx={{ flexGrow: 1 }}>
-          <TextField
-            sx={{
-              ...formControl,
-              "& .MuiFilledInput-root": {
-                backgroundColor: "rgba(255, 255, 255, 0.9)",
-                borderRadius: 2,
-                transition: "all 0.3s",
-                "&:hover": {
-                  backgroundColor: "rgba(255, 255, 255, 1)",
-                }
-              },
-              "& .MuiInputLabel-root": {
-                color: "primary.main",
-              },
-            }}
+          <StyledTextField
+            sx={formControl}
             id="filled-search"
             label="Search Movies"
             type="search"
@@ -145,25 +215,12 @@ export default function FilterMoviesCard(props) {
             value={props.titleFilter}
             onChange={handleTextChange}
             InputProps={{
-              startAdornment: <SearchIcon sx={{ mr: 1, color: "primary.main" }} />,
+              startAdornment: <SearchIcon sx={{ mr: 1, color: "#6366f1" }} />,
             }}
           />
 
-          <FormControl
-            sx={{
-              ...formControl,
-              "& .MuiInputBase-root": {
-                backgroundColor: "rgba(255, 255, 255, 0.9)",
-                borderRadius: 2,
-                transition: "all 0.3s",
-                "&:hover": {
-                  backgroundColor: "rgba(255, 255, 255, 1)",
-                }
-              },
-              "& .MuiInputLabel-root": {
-                color: "primary.main",
-              },
-            }}
+          <StyledFormControl
+            sx={formControl}
             variant="filled"
           >
             <InputLabel id="genre-label">Genre</InputLabel>
@@ -172,6 +229,27 @@ export default function FilterMoviesCard(props) {
               id="genre-select"
               value={props.genreFilter}
               onChange={handleGenreChange}
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    '& .MuiMenuItem-root': {
+                      color: 'white',
+                      '&:hover': {
+                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                      },
+                      '&.Mui-selected': {
+                        backgroundColor: 'rgba(99, 102, 241, 0.3)',
+                        '&:hover': {
+                          backgroundColor: 'rgba(99, 102, 241, 0.4)',
+                        },
+                      },
+                    },
+                  },
+                },
+              }}
             >
               {genres.map((genre) => (
                 <MenuItem key={genre.id} value={genre.id}>
@@ -179,29 +257,19 @@ export default function FilterMoviesCard(props) {
                 </MenuItem>
               ))}
             </Select>
-          </FormControl>
+          </StyledFormControl>
 
-          <Box 
-            sx={{ 
-              backgroundColor: "rgba(255, 255, 255, 0.9)",
-              padding: 2.5, 
-              borderRadius: 2,
-              transition: "all 0.3s",
-              "&:hover": {
-                backgroundColor: "rgba(255, 255, 255, 1)",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-              }
-            }}
-          >
+          <SliderContainer>
             <Typography 
               variant="subtitle1" 
               gutterBottom 
               sx={{
-                color: "text.primary",
+                color: "white",
                 fontWeight: 600,
                 display: "flex",
                 alignItems: "center",
                 gap: 1,
+                mb: 2,
               }}
             >
               <StarIcon sx={{ color: getRatingColor(props.voteAverageFilter || 0) }} />
@@ -228,18 +296,28 @@ export default function FilterMoviesCard(props) {
                   width: 24,
                   backgroundColor: '#fff',
                   border: `2px solid ${getRatingColor(props.voteAverageFilter || 0)}`,
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
                   '&:focus, &:hover, &.Mui-active, &.Mui-focusVisible': {
-                    boxShadow: `0px 0px 0px 8px ${getRatingColor(props.voteAverageFilter || 0)}33`,
+                    boxShadow: `0px 0px 0px 8px ${getRatingColor(props.voteAverageFilter || 0)}33, 0 4px 12px rgba(0, 0, 0, 0.3)`,
                   },
                 },
                 '& .MuiSlider-valueLabel': {
                   backgroundColor: getRatingColor(props.voteAverageFilter || 0),
+                  color: 'white',
+                  fontWeight: 600,
+                },
+                '& .MuiSlider-mark': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                },
+                '& .MuiSlider-markLabel': {
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  fontSize: '0.75rem',
                 },
               }}
             />
-          </Box>
+          </SliderContainer>
         </Stack>
       </CardContent>
-    </Card>
+    </StyledCard>
   );
 }
