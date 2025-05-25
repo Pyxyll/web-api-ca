@@ -19,6 +19,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import MoviesContextProvider from "./contexts/moviesContext";
 import WatchListMoviesPage from "./pages/WatchListMoviesPage";
 import AuthContextProvider from "./contexts/authContext";
+import ProfilePage from './pages/profilePage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -55,6 +56,8 @@ const App = () => {
             <Route path="/reviews/form" element={ <AddMovieReviewPage /> } />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            
           </Routes>
         </MoviesContextProvider>
       </BrowserRouter>

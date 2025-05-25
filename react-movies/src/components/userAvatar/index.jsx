@@ -64,6 +64,7 @@ const UserAvatar = ({ size = 'medium', showMenu = true }) => {
 
   const handleProfile = () => {
     handleClose();
+    navigate('/profile'); // Navigate to profile page
   };
 
   const handleLogout = () => {
